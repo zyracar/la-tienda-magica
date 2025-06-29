@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Mi Tienda Mágica de Accesorios para Ti!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic styling for the application */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe); /* Soft gradient background */
+            display: flex;
+            flex-direction: column; /* Arrange elements vertically */
+            justify-content: flex-start; /* Align to the top */
+            align-items: center; /* Center horizontally */
+            min-height: 100vh; /* Full viewport height */
+            padding: 20px; /* Padding around content */
+        }
+        /* Animations for smooth transitions */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.5s ease-out;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        /* Image display styles */
+        .product-image-display {
+            width: 100px;
+            height: 100px;
+            object-fit: contain; /* Ensure image fits without cropping */
+            border-radius: 8px; /* Soft corners */
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        /* Custom styles for enhanced UI */
+        .button-hover-effect {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .button-hover-effect:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-card {
+            transition: all 0.3s ease-out;
+            transform: scale(1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-card:hover {
+            transform: translateY(-3px) scale(1.005);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #60a5fa; /* blue-400 */
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5); /* ring-blue-400 with opacity */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="w-full max-w-4xl bg-white p-8 rounded-xl shadow-2xl border border-blue-200 flex flex-col items-center">
+        <h1 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">
+            ¡Descubre Nuestros Tesoros!
+        </h1>
+
+        <!-- Navigation Buttons for Clients -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8 w-full">
+            <button id="displayCatalogBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-blue-600 text-white shadow-blue-400 button-hover-effect">
+                <i class="fas fa-store mr-2"></i>Catálogo de Tesoros
+            </button>
+            <button id="shoppingCartBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-white text-blue-600 border border-blue-400 hover:bg-blue-50 button-hover-effect">
+                <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito <span id="cartItemCount" class="ml-1 px-2 py-1 bg-blue-600 text-white rounded-full text-sm">0</span>
+            </button>
+        </div>
+
+        <!-- Display Catalog Section for Clients -->
+        <div id="displayCatalogSection" class="w-full animate-fade-in-down">
+            <h2 class="text-3xl font-bold text-teal-700 mb-6 text-center">
+                <i class="fas fa-gem mr-2"></i>¡Elige tus Accesorios Favoritos!
+            </h2>
+            <!-- Category Filter for catalog -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100 shadow-sm section-card">
+                <label for="displayCategoryFilter" class="font-semibold text-gray-700">Filtrar por Categoría:</label>
+                <select id="displayCategoryFilter" class="p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition flex-grow">
+                    <option value="Todas">Todas las categorías</option>
+                    <option value="Anillos">Anillos</option>
+                    <option value="Collares">Collares</option>
+                    <option value="Aretes">Aretes</option>
+                    <option value="Pulseras">Pulseras</option>
+                    <option value="Ofertas">Ofertas</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+            
+            <div id="displayProductGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Product cards will be inserted here -->
+                <p class="text-center text-gray-600 italic sm:col-span-full">¡Aquí se mostrarán nuestros hermosos accesorios!</p>
+            </div>
+        </div>
+
+        <!-- Shopping Cart Section -->
+        <div id="shoppingCartSection" class="w-full hidden animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">
+                <i class="fas fa-shopping-cart mr-2"></i>Tu Carrito de Compras
+            </h2>
+
+            <div class="mb-8 p-6 bg-white rounded-lg border border-blue-100 shadow-md section-card">
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                    Tesoros Seleccionados
+                </h3>
+                <ul id="cartItemsList" class="space-y-4 mb-6">
+                    <!-- Cart items will be listed here -->
+                    <p class="text-center text-gray-600 italic">¡Tu carrito está vacío! ¡Añade algunos tesoros!</p>
+                </ul>
+
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                    Tus Datos para el Pedido
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <input type="text" id="clientName" placeholder="Nombre Completo" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                    <input type="text" id="clientId" placeholder="Número de Cédula" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                </div>
+                
+                <button id="sendOrderWhatsappBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-md button-hover-effect">
+                    <i class="fab fa-whatsapp mr-2"></i>Enviar Pedido por WhatsApp
+                </button>
+                <p class="text-center text-gray-500 text-sm mt-3">
+                    Nota: Una vez enviado, nos pondremos en contacto para confirmar disponibilidad y entrega.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="mt-8 mb-8 p-6 w-full max-w-4xl bg-blue-100 rounded-xl shadow-lg border border-blue-200 text-center animate-fade-in-up section-card">
+        <h2 class="text-2xl font-bold text-blue-800 mb-3">¡Contáctanos!</h2>
+        <p class="text-gray-700 text-lg mb-2">
+            <i class="fab fa-whatsapp text-green-500 mr-2"></i>Whatsapp: <a href="https://wa.me/584126898439" target="_blank" class="text-blue-600 hover:underline">04126898439</a>
+        </p>
+        <p class="text-700 text-lg">
+            Hacemos entregas personales en <span class="font-semibold text-blue-700">San Juan de Los Morros</span> y envíos a nivel nacional.
+        </p>
+    </div>
+
+    <script>
+        // Global arrays to store product and sales data (for this client-side version, only products are needed for display)
+        let products = [];
+        let shoppingCart = []; 
+
+        // DOM element references
+        const displayCatalogBtn = document.getElementById('displayCatalogBtn');
+        const shoppingCartBtn = document.getElementById('shoppingCartBtn'); 
+
+        const displayCatalogSection = document.getElementById('displayCatalogSection');
+        const shoppingCartSection = document.getElementById('shoppingCartSection'); 
+
+        const displayProductGrid = document.getElementById('displayProductGrid');
+
+        const cartItemCountSpan = document.getElementById('cartItemCount'); 
+        const cartItemsList = document.getElementById('cartItemsList'); 
+        const clientNameInput = document.getElementById('clientName'); 
+        const clientIdInput = document.getElementById('clientId'); 
+        const sendOrderWhatsappBtn = document.getElementById('sendOrderWhatsappBtn'); 
+
+        const displayCategoryFilter = document.getElementById('displayCategoryFilter');
+
+        // Function to display custom modal messages
+        function showModal(message) {
+            const modalDiv = document.createElement('div');
+            modalDiv.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+            modalDiv.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full border border-blue-300">
+                    <p class="text-gray-800 text-lg font-medium mb-4 text-center">${message}</p>
+                    <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105" onclick="this.parentNode.parentNode.remove()">
+                        ¡Entendido!
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+        }
+
+        // Function to switch between application sections/pages
+        function showPage(page) {
+            // Hide all sections
+            displayCatalogSection.classList.add('hidden');
+            shoppingCartSection.classList.add('hidden'); 
+
+            // Reset active styles for all navigation buttons
+            [displayCatalogBtn, shoppingCartBtn].forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-blue-400');
+                btn.classList.add('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+            });
+
+            // Show selected section and set active button style
+            if (page === 'displayCatalog') {
+                displayCatalogSection.classList.remove('hidden');
+                displayCatalogBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                displayCatalogBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+                renderDisplayCatalog();
+            } else if (page === 'shoppingCart') { 
+                shoppingCartSection.classList.remove('hidden');
+                shoppingCartBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                shoppingCartBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+                renderShoppingCart(); 
+            }
+        }
+
+        // Function to render the Display Catalog
+        function renderDisplayCatalog() {
+            displayProductGrid.innerHTML = '';
+            const selectedCategory = displayCategoryFilter.value;
+
+            const filteredProducts = products.filter(product => {
+                // Only show products with quantity > 0
+                return product.quantity > 0 && (selectedCategory === 'Todas' || (product.category && product.category === selectedCategory));
+            });
+
+            if (filteredProducts.length === 0) {
+                displayProductGrid.innerHTML = '<p class="text-center text-gray-600 italic sm:col-span-full">¡No se encontraron tesoros que coincidan con la categoría seleccionada o están agotados!</p>';
+                return;
+            }
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col items-center text-center transition transform hover:scale-105 section-card';
+                card.innerHTML = `
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="w-32 h-32 object-contain rounded-lg mb-4 product-image-display">` : '<img src="https://placehold.co/128x128/CCCCCC/666666?text=No+Img" alt="No Image" class="w-32 h-32 object-contain rounded-lg mb-4">'}
+                    <p class="font-bold text-xl text-blue-800 mb-1">${product.name}</p>
+                    <p class="text-gray-700 text-sm mb-2">${product.description || 'Sin descripción'}</p>
+                    <p class="text-gray-600 text-xs italic">Categoría: ${product.category || 'N/A'}</p>
+                    <p class="font-extrabold text-2xl text-green-700">Precio: $${product.sellingPrice.toFixed(2)}</p>
+                    <p class="text-gray-500 text-xs mt-1">SKU: ${product.sku} | Cantidad Disponible: ${product.quantity}</p>
+                    <div class="flex items-center mt-3">
+                        <input type="number" id="qty-${product.sku}" value="1" min="1" max="${product.quantity}" class="w-20 p-2 border border-gray-300 rounded-md text-center mr-2">
+                        <button onclick="addToCart('${product.sku}')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-sm button-hover-effect">
+                            <i class="fas fa-cart-plus mr-1"></i> Añadir
+                        </button>
+                    </div>
+                `;
+                displayProductGrid.appendChild(card);
+            });
+        }
+
+        // Function to add a product to the shopping cart
+        window.addToCart = (sku) => {
+            const product = products.find(p => p.sku === sku);
+            const quantityInput = document.getElementById(`qty-${sku}`);
+            const quantity = parseInt(quantityInput.value, 10);
+
+            if (!product) {
+                showModal("¡Lo siento! Ese tesoro no está disponible.");
+                return;
+            }
+            if (isNaN(quantity) || quantity <= 0) {
+                showModal("¡Por favor, introduce una cantidad válida!");
+                return;
+            }
+            if (quantity > product.quantity) {
+                showModal(`¡Solo tienes ${product.quantity} de ${product.name} disponible! No puedes añadir ${quantity}.`);
+                return;
+            }
+
+            const existingCartItem = shoppingCart.find(item => item.sku === sku);
+
+            if (existingCartItem) {
+                // Check if adding more would exceed available stock
+                if (existingCartItem.quantity + quantity > product.quantity) {
+                    showModal(`¡Ya tienes ${existingCartItem.quantity} de ${product.name} en el carrito! No puedes añadir más de lo disponible (${product.quantity - existingCartItem.quantity} restantes).`);
+                    return;
+                }
+                existingCartItem.quantity += quantity;
+            } else {
+                shoppingCart.push({
+                    sku: product.sku,
+                    name: product.name,
+                    price: product.sellingPrice,
+                    quantity: quantity
+                });
+            }
+            saveShoppingCartToLocalStorage();
+            updateCartItemCount();
+            renderShoppingCart(); 
+            showModal(`${quantity}x ${product.name} añadido al carrito.`);
+        };
+
+        // Function to update item quantity in shopping cart
+        window.updateCartQuantity = (sku, newQuantity) => {
+            const cartItem = shoppingCart.find(item => item.sku === sku);
+            const productInInventory = products.find(p => p.sku === sku);
+
+            if (!cartItem || !productInInventory) return;
+
+            const parsedQuantity = parseInt(newQuantity, 10);
+
+            if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+                showModal("¡La cantidad debe ser un número positivo!");
+                renderShoppingCart(); 
+                return;
+            }
+
+            if (parsedQuantity > productInInventory.quantity) {
+                showModal(`¡Solo tienes ${productInInventory.quantity} de ${productInInventory.name} disponible! No puedes añadir ${parsedQuantity}.`);
+                cartItem.quantity = productInInventory.quantity; 
+            } else {
+                cartItem.quantity = parsedQuantity;
+            }
+            saveShoppingCartToLocalStorage();
+            updateCartItemCount();
+            renderShoppingCart();
+        };
+
+        // Function to remove an item from the shopping cart
+        window.removeFromCart = (sku) => {
+            shoppingCart = shoppingCart.filter(item => item.sku !== sku);
+            saveShoppingCartToLocalStorage();
+            updateCartItemCount();
+            renderShoppingCart();
+            showModal("Tesoro eliminado del carrito.");
+        };
+
+        // Function to render the shopping cart items
+        function renderShoppingCart() {
+            cartItemsList.innerHTML = '';
+            if (shoppingCart.length === 0) {
+                cartItemsList.innerHTML = '<p class="text-center text-gray-600 italic">¡Tu carrito está vacío! ¡Añade algunos tesoros!</p>';
+                return;
+            }
+
+            shoppingCart.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center';
+                li.innerHTML = `
+                    <div class="flex-grow text-left mb-2 md:mb-0">
+                        <p class="font-bold text-lg text-blue-700">${item.name}</p>
+                        <p class="text-gray-700">SKU: ${item.sku}</p>
+                        <p class="text-gray-700">Precio unitario: $${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2 md:mt-0">
+                        <label for="cart-qty-${item.sku}" class="text-gray-700">Cantidad:</label>
+                        <input type="number" id="cart-qty-${item.sku}" value="${item.quantity}" min="1" max="${products.find(p => p.sku === item.sku)?.quantity || 1}" 
+                               onchange="updateCartQuantity('${item.sku}', this.value)" 
+                               class="w-20 p-2 border border-gray-300 rounded-md text-center">
+                        <button onclick="removeFromCart('${item.sku}')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-sm button-hover-effect">
+                            <i class="fas fa-trash-alt"></i> Quitar
+                        </button>
+                    </div>
+                `;
+                cartItemsList.appendChild(li);
+            });
+        }
+
+        // Function to update the cart item count in the navigation button
+        function updateCartItemCount() {
+            const totalItemsInCart = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+            cartItemCountSpan.textContent = totalItemsInCart;
+            // Optionally, hide the badge if cart is empty
+            if (totalItemsInCart === 0) {
+                cartItemCountSpan.classList.add('hidden');
+            } else {
+                cartItemCountSpan.classList.remove('hidden');
+            }
+        }
+
+        // Event listener for "Send Order by WhatsApp" button
+        sendOrderWhatsappBtn.addEventListener('click', () => {
+            const clientName = clientNameInput.value.trim();
+            const clientId = clientIdInput.value.trim();
+
+            if (!clientName || !clientId) {
+                showModal("¡Por favor, completa tu Nombre Completo y Número de Cédula antes de enviar el pedido!");
+                return;
+            }
+            if (shoppingCart.length === 0) {
+                showModal("¡Tu carrito está vacío! Añade tesoros antes de enviar un pedido.");
+                return;
+            }
+
+            let orderMessage = `¡Hola! Soy *${clientName}* (C.I.: *${clientId}*) y me gustaría hacer el siguiente pedido:\n\n`;
+            shoppingCart.forEach(item => {
+                orderMessage += `- *${item.name}* (SKU: ${item.sku}): ${item.quantity} unidad(es)\n`;
+            });
+            orderMessage += `\n¡Gracias!`;
+
+            // WhatsApp number for testing
+            const whatsappNumber = '584126898439'; 
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(orderMessage)}`;
+
+            window.open(whatsappUrl, '_blank');
+            showModal("¡Pedido enviado a WhatsApp! Te esperamos.");
+
+            // Clear the cart after sending the order
+            shoppingCart = [];
+            saveShoppingCartToLocalStorage();
+            updateCartItemCount();
+            renderShoppingCart();
+            clientNameInput.value = '';
+            clientIdInput.value = '';
+        });
+
+        // Connect navigation buttons to page display functions
+        displayCatalogBtn.addEventListener('click', () => showPage('displayCatalog'));
+        shoppingCartBtn.addEventListener('click', () => showPage('shoppingCart')); 
+
+        // Event listener for category filter
+        displayCategoryFilter.addEventListener('change', renderDisplayCatalog);
+
+        // ===========================================
+        // LOCAL STORAGE FUNCTIONS for this client version
+        // ===========================================
+
+        // Load products from Local Storage (only for display, no direct editing here)
+        function loadProductsFromLocalStorage() {
+            try {
+                const storedProducts = localStorage.getItem('myMagicShopProducts');
+                if (storedProducts) {
+                    products = JSON.parse(storedProducts);
+                    // Ensure older products have default minStock and category if missing
+                    products = products.map(product => ({
+                        ...product,
+                        category: product.category || 'Otros',
+                        minStock: typeof product.minStock === 'number' ? product.minStock : 0 
+                    }));
+                } else {
+                    products = [];
+                }
+            } catch (e) {
+                console.error("Error al cargar productos de Local Storage en versión cliente:", e);
+                products = [];
+            }
+        }
+
+        // Save shopping cart to Local Storage
+        function saveShoppingCartToLocalStorage() {
+            try {
+                localStorage.setItem('myMagicShopShoppingCartClient', JSON.stringify(shoppingCart));
+            } catch (e) {
+                console.error("Error al guardar el carrito en Local Storage de cliente:", e);
+            }
+        }
+
+        // Load shopping cart from Local Storage
+        function loadShoppingCartFromLocalStorage() {
+            try {
+                const storedCart = localStorage.getItem('myMagicShopShoppingCartClient');
+                if (storedCart) {
+                    shoppingCart = JSON.parse(storedCart);
+                } else {
+                    shoppingCart = [];
+                }
+            } catch (e) {
+                console.error("Error al cargar el carrito de Local Storage de cliente:", e);
+                shoppingCart = [];
+            }
+        }
+
+        // On page load, load saved products and shopping cart, then show the catalog by default
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductsFromLocalStorage();
+            loadShoppingCartFromLocalStorage(); 
+            updateCartItemCount(); 
+            showPage('displayCatalog'); // Default page to show on load
+        });
+    </script>
+</body>
+</html>

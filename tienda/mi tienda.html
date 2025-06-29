@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda Mágica de Accesorios Sencilla</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic styling for the application */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe); /* Soft gradient background */
+            display: flex;
+            flex-direction: column; /* Arrange elements vertically */
+            justify-content: flex-start; /* Align to the top */
+            align-items: center; /* Center horizontally */
+            min-height: 100vh; /* Full viewport height */
+            padding: 20px; /* Padding around content */
+        }
+        /* Animations for smooth transitions */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.5s ease-out;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        /* Image display styles */
+        .product-image-preview, .product-image-display {
+            width: 100px;
+            height: 100px;
+            object-fit: contain; /* Ensure image fits without cropping */
+            border-radius: 8px; /* Soft corners */
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .product-image-preview.hidden {
+            display: none;
+        }
+        /* Highlight for low stock items */
+        .low-stock-warning {
+            color: #ef4444; /* Red color for warning */
+            font-weight: bold;
+        }
+
+        /* Custom styles for enhanced UI */
+        .button-hover-effect {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .button-hover-effect:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-card {
+            transition: all 0.3s ease-out;
+            transform: scale(1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-card:hover {
+            transform: translateY(-3px) scale(1.005);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #60a5fa; /* blue-400 */
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5); /* ring-blue-400 with opacity */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="w-full max-w-4xl bg-white p-8 rounded-xl shadow-2xl border border-blue-200 flex flex-col items-center">
+        <h1 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">
+            ¡Mi Tienda Mágica de Accesorios!
+        </h1>
+
+        <!-- Navigation Buttons - Responsive layout with enhanced hover effects -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8 w-full">
+            <button id="inventoryBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-blue-600 text-white shadow-blue-400 button-hover-effect">
+                <i class="fas fa-warehouse mr-2"></i>Mi Almacén (Inventario)
+            </button>
+            <button id="displayCatalogBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-white text-blue-600 border border-blue-400 hover:bg-blue-50 button-hover-effect">
+                <i class="fas fa-store mr-2"></i>Catálogo de Exhibición
+            </button>
+            <button id="calculatorBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-white text-blue-600 border border-blue-400 hover:bg-blue-50 button-hover-effect">
+                <i class="fas fa-calculator mr-2"></i>Calculadora de Tienda
+            </button>
+            <button id="salesReportBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-white text-blue-600 border border-blue-400 hover:bg-blue-50 button-hover-effect">
+                <i class="fas fa-chart-line mr-2"></i>Reportes de Ventas
+            </button>
+            <button id="lowStockAlertBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-white text-red-600 border border-red-400 hover:bg-red-50 button-hover-effect">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Alertas de Stock
+            </button>
+            <button id="advancedConfigBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-white text-blue-600 border border-blue-400 hover:bg-blue-50 button-hover-effect">
+                <i class="fas fa-cog mr-2"></i>Configuración Avanzada
+            </button>
+            <!-- New Button for Client Catalog -->
+            <button id="shareClientCatalogBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-purple-600 text-white shadow-purple-400 button-hover-effect">
+                <i class="fas fa-share-alt mr-2"></i>Compartir Catálogo Cliente
+            </button>
+        </div>
+
+        <!-- Inventory Section -->
+        <div id="inventorySection" class="w-full animate-fade-in-down">
+            <h2 class="text-3xl font-bold text-purple-700 mb-6 text-center">
+                <i class="fas fa-boxes mr-2"></i>Gestión de Mis Tesoros
+            </h2>
+
+            <!-- Search bar for inventory -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100 shadow-sm">
+                <input type="text" id="inventorySearch" placeholder="Busca tesoros por nombre, SKU o descripción..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+            </div>
+
+            <div class="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-100 shadow-md section-card">
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                    ¡Añade un Tesoro Nuevo!
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="productName" placeholder="Nombre del Tesoro" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                    <input type="text" id="productSKU" placeholder="SKU (Código Secreto)" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                    <input type="number" id="productQuantity" placeholder="Cantidad (Cuántos tengo)" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                    
+                    <!-- Description field -->
+                    <textarea id="productDescription" placeholder="Descripción del Tesoro (para el catálogo)" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition md:col-span-2"></textarea>
+
+                    <!-- Category field -->
+                    <select id="productCategory" class="p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition md:col-span-2">
+                        <option value="">Selecciona una Categoría</option>
+                        <option value="Anillos">Anillos</option>
+                        <option value="Collares">Collares</option>
+                        <option value="Aretes">Aretes</option>
+                        <option value="Pulseras">Pulseras</option>
+                        <option value="Ofertas">Ofertas</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+
+                    <!-- Fields for final price calculation -->
+                    <input type="number" id="inputCost" placeholder="Costo del Producto" class="w-full p-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition mb-2">
+                    <input type="number" id="inputShipping" placeholder="Precio de Envío" class="w-full p-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition mb-2">
+                    <input type="number" id="inputProfitPercentage" placeholder="Porcentaje de Ganancia (0-100%)" min="0" max="100" class="w-full p-3 border border-green-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+
+                    <!-- New: Minimum Stock for Alerts -->
+                    <input type="number" id="minStockQuantity" placeholder="Cantidad Mínima para Alerta" min="0" class="w-full p-3 border border-orange-300 rounded-md focus:ring-2 focus:ring-orange-400 focus:border-transparent transition md:col-span-2">
+
+                    <!-- Image input field -->
+                    <div class="md:col-span-2">
+                        <label for="productImage" class="block text-sm font-medium text-gray-700 mb-2">¡Sube una foto de tu tesoro!</label>
+                        <input type="file" id="productImage" accept="image/*" class="w-full p-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                        <img id="imagePreview" src="https://placehold.co/100x100/A0B9D7/FFFFFF?text=Previa" alt="Previsualización de imagen" class="product-image-preview mt-2 hidden mx-auto">
+                    </div>
+                </div>
+                <button id="addProductBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-md button-hover-effect">
+                    ¡Guardar Tesoro!
+                </button>
+            </div>
+
+            <div class="p-6 bg-purple-50 rounded-lg border border-purple-100 shadow-md section-card">
+                <h3 class="text-2xl font-semibold text-purple-600 mb-4 text-center">
+                    <i class="fas fa-list-alt mr-2"></i>Lista de Tesoros en Almacén
+                </h3>
+                <ul id="productList" class="space-y-4">
+                    <!-- Products will be displayed here -->
+                    <p class="text-center text-gray-600 italic">¡Aún no tienes tesoros en el almacén! ¡Añade algunos!</p>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Display Catalog Section -->
+        <div id="displayCatalogSection" class="w-full hidden animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-teal-700 mb-6 text-center">
+                <i class="fas fa-store mr-2"></i>¡Nuestro Escaparate Mágico!
+            </h2>
+            <!-- Category Filter for catalog -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100 shadow-sm section-card">
+                <label for="displayCategoryFilter" class="font-semibold text-gray-700">Filtrar por Categoría:</label>
+                <select id="displayCategoryFilter" class="p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition flex-grow">
+                    <option value="Todas">Todas las categorías</option>
+                    <option value="Anillos">Anillos</option>
+                    <option value="Collares">Collares</option>
+                    <option value="Aretes">Aretes</option>
+                    <option value="Pulseras">Pulseras</option>
+                    <option value="Ofertas">Ofertas</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+            
+            <div id="displayProductGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Product cards will be inserted here -->
+                <p class="text-center text-gray-600 italic sm:col-span-full">¡Aquí se mostrarán tus hermosos accesorios!</p>
+            </div>
+        </div>
+
+        <!-- Calculator Section -->
+        <div id="calculatorSection" class="w-full hidden animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-green-700 mb-6 text-center">
+                <i class="fas fa-dollar-sign mr-2"></i>Mi Máquina de Contar Tesoros
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Shipping Cost Per Unit -->
+                <div class="md:col-span-2 p-6 bg-blue-50 rounded-lg border border-blue-100 shadow-md section-card">
+                    <h3 class="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                        <i class="fas fa-shipping-fast mr-2"></i>Costo de Envío por Unidad
+                    </h3>
+                    <div class="mb-4">
+                        <input type="number" id="totalProductsCost" placeholder="Costo Total de Productos (Ej: 100)" class="w-full p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition mb-2">
+                        <input type="number" id="totalShippingCost" placeholder="Costo Total de Envío (Ej: 15)" class="w-full p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition mb-2">
+                        <input type="number" id="numberOfProducts" placeholder="Cantidad Total de Productos (Ej: 10)" class="w-full p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                    </div>
+                    <button id="calculateShippingPerUnitBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-md button-hover-effect">
+                        ¡Calcular Envío por Unidad!
+                    </button>
+                    <p class="mt-4 text-xl font-bold text-center">
+                        Envío por Unidad: <span id="shippingPerUnitResult" class="text-green-700">$0.00</span>
+                    </p>
+                </div>
+
+                <!-- Product Quantities (Inventory) - Existing section -->
+                <div class="md:col-span-2 p-6 bg-yellow-50 rounded-lg border border-yellow-100 shadow-md section-card">
+                    <h3 class="text-2xl font-semibold text-yellow-700 mb-4 text-center">
+                        <i class="fas fa-boxes mr-2"></i>Mis Cantidades de Tesoros (Inventario)
+                    </h3>
+                    <div class="mb-4">
+                        <input type="text" id="calcSKU" placeholder="SKU del Tesoro" class="w-full p-3 border border-yellow-300 rounded-md focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition mb-2">
+                        <input type="number" id="calcQuantityChange" placeholder="Cambio de Cantidad (+/-)" class="w-full p-3 border border-yellow-300 rounded-md focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition">
+                    </div>
+                    <button id="updateQuantityBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-md button-hover-effect">
+                        ¡Actualizar Cantidad!
+                    </button>
+                    <h4 class="text-xl font-semibold text-purple-700 mt-6 mb-3 text-center">
+                        <i class="fas fa-cubes mr-2"></i>Inventario Actual:
+                    </h4>
+                    <ul id="currentInventoryList" class="space-y-2 max-h-48 overflow-y-auto pr-2">
+                        <!-- Current inventory will be displayed here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Report Section -->
+        <div id="salesReportSection" class="w-full hidden animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">
+                <i class="fas fa-chart-line mr-2"></i>Reportes Mágicos de Ventas
+            </h2>
+
+            <div class="mb-8 p-6 bg-green-50 rounded-lg border border-green-100 shadow-md section-card">
+                <h3 class="text-2xl font-semibold text-green-600 mb-4 text-center">
+                    ¡Registra una Nueva Venta!
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="date" id="saleDate" class="p-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition">
+                    <input type="text" id="saleSKU" placeholder="SKU del Tesoro Vendido" class="p-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition">
+                    <input type="number" id="saleQuantity" placeholder="Cantidad Vendida" min="1" class="p-3 border border-green-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition">
+                </div>
+                <button id="addSaleBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-md button-hover-effect">
+                    ¡Registrar Venta!
+                </button>
+            </div>
+
+            <div class="p-6 bg-blue-50 rounded-lg border border-blue-100 shadow-md section-card">
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                    <i class="fas fa-cash-register mr-2"></i>Resumen de Ventas
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center mb-6">
+                    <div class="p-4 bg-white rounded-lg shadow-sm border border-blue-200">
+                        <p class="text-lg text-gray-700">Tesoros Vendidos:</p>
+                        <p class="text-3xl font-bold text-blue-800" id="totalItemsSold">0</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-sm border border-blue-200">
+                        <p class="text-lg text-gray-700">Dinero Generado:</p>
+                        <p class="text-3xl font-bold text-green-700" id="totalRevenue">$0.00</p>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-semibold text-blue-600 mb-4 text-center">
+                    <i class="fas fa-history mr-2"></i>Historial de Transacciones
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-sm border border-gray-200">
+                        <thead>
+                            <tr class="bg-gray-100 border-b border-gray-200">
+                                <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Fecha</th>
+                                <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Producto</th>
+                                <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Cantidad</th>
+                                <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Total Venta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <!-- Sale rows will be inserted here -->
+                            <tr id="noSalesMessage">
+                                <td colspan="4" class="py-4 text-center text-gray-600 italic">¡Aún no hay ventas registradas!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alerts Section -->
+        <div id="lowStockAlertsSection" class="w-full hidden animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-red-700 mb-6 text-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>¡Tesoros con Poco Stock!
+            </h2>
+            <div class="p-6 bg-red-50 rounded-lg border border-red-100 shadow-md section-card">
+                <h3 class="text-2xl font-semibold text-red-600 mb-4 text-center">
+                    Lista de Tesoros con Bajo Stock
+                </h3>
+                <ul id="lowStockList" class="space-y-4">
+                    <!-- Low stock products will be listed here -->
+                    <p class="text-center text-gray-600 italic">¡Todos tus tesoros tienen stock suficiente!</p>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Advanced Configuration Section -->
+        <div id="advancedConfigSection" class="w-full hidden animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-gray-700 mb-6 text-center">
+                <i class="fas fa-cog mr-2"></i>Configuración Avanzada
+            </h2>
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-100 shadow-md section-card text-center">
+                <h3 class="text-2xl font-semibold text-gray-600 mb-4">
+                    <i class="fas fa-hdd mr-2"></i>Copia de Seguridad y Restauración
+                </h3>
+                <p class="text-gray-700 mb-4">¡Guarda o restaura todos tus tesoros y ventas!</p>
+                <button id="exportDataBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-indigo-500 text-white shadow-indigo-300 button-hover-effect mb-4">
+                    <i class="fas fa-file-export mr-2"></i>Exportar Datos
+                </button>
+                <div class="mb-4">
+                    <label for="importFileInput" class="block text-sm font-medium text-gray-700 mb-2">Selecciona tu copia de seguridad (.json):</label>
+                    <input type="file" id="importFileInput" accept=".json" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition">
+                </div>
+                <button id="importDataBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-teal-500 text-white shadow-teal-300 button-hover-effect">
+                    <i class="fas fa-file-import mr-2"></i>Importar Datos
+                </button>
+            </div>
+            
+            <div class="p-6 bg-red-50 rounded-lg border border-red-100 shadow-md section-card text-center">
+                <h3 class="text-2xl font-semibold text-red-600 mb-4">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>¡Zona Peligrosa!
+                </h3>
+                <p class="text-gray-700 mb-6">Este botón borrará TODOS tus tesoros guardados en este navegador. ¡Úsalo con extrema precaución!</p>
+                <button id="clearLocalStorageBtn" class="px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-red-600 text-white shadow-red-400 button-hover-effect">
+                    <i class="fas fa-skull-crossbones mr-2"></i>Borrar todo del Cuaderno Mágico
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="mt-8 mb-8 p-6 w-full max-w-4xl bg-blue-100 rounded-xl shadow-lg border border-blue-200 text-center animate-fade-in-up section-card">
+        <h2 class="text-2xl font-bold text-blue-800 mb-3">¡Contáctanos!</h2>
+        <p class="text-gray-700 text-lg mb-2">
+            <i class="fab fa-whatsapp text-green-500 mr-2"></i>Whatsapp: <a href="https://wa.me/584248347653" target="_blank" class="text-blue-600 hover:underline">04248347653</a>
+        </p>
+        <p class="text-700 text-lg">
+            Hacemos entregas personales en <span class="font-semibold text-blue-700">San Juan de Los Morros</span> y envíos a nivel nacional.
+        </p>
+    </div>
+
+    <!-- Download Buttons at the bottom and centered -->
+    <div class="mt-auto flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full max-w-4xl justify-center mb-8">
+        <button id="downloadInventoryBtn" class="flex-1 px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-indigo-600 text-white shadow-indigo-400 button-hover-effect">
+            <i class="fas fa-download mr-2"></i>Descargar Inventario Completo
+        </button>
+        <button id="downloadDisplayCatalogBtn" class="flex-1 px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg bg-teal-600 text-white shadow-teal-400 button-hover-effect">
+            <i class="fas fa-file-image mr-2"></i>Descargar Catálogo para Exhibir
+        </button>
+    </div>
+
+    <script>
+        // Global arrays to store product and sales data
+        let products = [];
+        let salesRecords = [];
+        let shoppingCart = []; // New global array for shopping cart items
+
+        // DOM element references
+        const inventoryBtn = document.getElementById('inventoryBtn');
+        const displayCatalogBtn = document.getElementById('displayCatalogBtn');
+        const calculatorBtn = document.getElementById('calculatorBtn');
+        const salesReportBtn = document.getElementById('salesReportBtn');
+        const lowStockAlertBtn = document.getElementById('lowStockAlertBtn'); 
+        const advancedConfigBtn = document.getElementById('advancedConfigBtn');
+        const shareClientCatalogBtn = document.getElementById('shareClientCatalogBtn'); // New button reference
+
+        const inventorySection = document.getElementById('inventorySection');
+        const displayCatalogSection = document.getElementById('displayCatalogSection');
+        const calculatorSection = document.getElementById('calculatorSection');
+        const salesReportSection = document.getElementById('salesReportSection');
+        const lowStockAlertsSection = document.getElementById('lowStockAlertsSection'); 
+        const advancedConfigSection = document.getElementById('advancedConfigSection');
+
+        const productNameInput = document.getElementById('productName');
+        const productSKUInput = document.getElementById('productSKU');
+        const productQuantityInput = document.getElementById('productQuantity');
+        const productDescriptionInput = document.getElementById('productDescription');
+        const productCategoryInput = document.getElementById('productCategory');
+        const productImageInput = document.getElementById('productImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const productList = document.getElementById('productList');
+
+        const inputCost = document.getElementById('inputCost');
+        const inputShipping = document.getElementById('inputShipping');
+        const inputProfitPercentage = document.getElementById('inputProfitPercentage');
+        const minStockQuantityInput = document.getElementById('minStockQuantity'); 
+
+        const totalProductsCostInput = document.getElementById('totalProductsCost');
+        const totalShippingCostInput = document.getElementById('totalShippingCost');
+        const numberOfProductsInput = document.getElementById('numberOfProducts');
+        const calculateShippingPerUnitBtn = document.getElementById('calculateShippingPerUnitBtn');
+        const shippingPerUnitResultSpan = document.getElementById('shippingPerUnitResult');
+
+        const calcSKUInput = document.getElementById('calcSKU');
+        const calcQuantityChangeInput = document.getElementById('calcQuantityChange');
+        const updateQuantityBtn = document.getElementById('updateQuantityBtn');
+        const currentInventoryList = document.getElementById('currentInventoryList');
+
+        const displayProductGrid = document.getElementById('displayProductGrid');
+
+        const saleDateInput = document.getElementById('saleDate');
+        const saleSKUInput = document.getElementById('saleSKU');
+        const saleQuantityInput = document.getElementById('saleQuantity');
+        const addSaleBtn = document.getElementById('addSaleBtn');
+        const totalItemsSoldSpan = document.getElementById('totalItemsSold');
+        const totalRevenueSpan = document.getElementById('totalRevenue');
+        const salesTableBody = document.getElementById('salesTableBody');
+        const noSalesMessageRow = document.getElementById('noSalesMessage');
+        const lowStockList = document.getElementById('lowStockList'); 
+
+        const downloadInventoryBtn = document.getElementById('downloadInventoryBtn');
+        const downloadDisplayCatalogBtn = document.getElementById('downloadDisplayCatalogBtn');
+
+        const clearLocalStorageBtn = document.getElementById('clearLocalStorageBtn');
+
+        // New DOM elements for backup/restore
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const importFileInput = document.getElementById('importFileInput');
+        const importDataBtn = document.getElementById('importDataBtn');
+
+        const inventorySearchInput = document.getElementById('inventorySearch');
+        const displayCategoryFilter = document.getElementById('displayCategoryFilter');
+
+        const SECRET_KEY = "2805991610"; // Secret key for advanced actions
+
+        let currentImageBase64 = ''; // Variable to store selected image data
+
+        // Event listener for image file selection
+        productImageInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    currentImageBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = "https://placehold.co/100x100/A0B9D7/FFFFFF?text=Previa";
+                imagePreview.classList.add('hidden');
+                currentImageBase64 = '';
+            }
+        });
+
+        // Function to display custom modal messages
+        function showModal(message) {
+            const modalDiv = document.createElement('div');
+            modalDiv.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+            modalDiv.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full border border-blue-300">
+                    <p class="text-gray-800 text-lg font-medium mb-4 text-center">${message}</p>
+                    <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105" onclick="this.parentNode.parentNode.remove()">
+                        ¡Entendido!
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+        }
+
+        // Function to show password confirmation modal
+        function showPasswordModal(onCorrectPassword) {
+            const modalDiv = document.createElement('div');
+            modalDiv.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+            modalDiv.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full border border-blue-300">
+                    <p class="text-gray-800 text-lg font-medium mb-4 text-center">Ingresa la clave secreta para continuar:</p>
+                    <input type="password" id="passwordInput" class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Clave Secreta">
+                    <button id="confirmPasswordBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105">
+                        Confirmar
+                    </button>
+                    <button class="w-full bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 mt-2" onclick="this.parentNode.parentNode.remove()">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+
+            document.getElementById('confirmPasswordBtn').addEventListener('click', () => {
+                const enteredPassword = document.getElementById('passwordInput').value;
+                if (enteredPassword === SECRET_KEY) {
+                    modalDiv.remove();
+                    onCorrectPassword();
+                } else {
+                    showModal("¡Clave incorrecta! Intenta de nuevo.");
+                    modalDiv.remove();
+                }
+            });
+        }
+
+        // Function to switch between application sections/pages
+        function showPage(page) {
+            // Hide all sections
+            inventorySection.classList.add('hidden');
+            displayCatalogSection.classList.add('hidden');
+            calculatorSection.classList.add('hidden');
+            salesReportSection.classList.add('hidden');
+            lowStockAlertsSection.classList.add('hidden'); 
+            advancedConfigSection.classList.add('hidden');
+
+            // Reset active styles for all navigation buttons
+            [inventoryBtn, displayCatalogBtn, calculatorBtn, salesReportBtn, lowStockAlertBtn, advancedConfigBtn, shareClientCatalogBtn].forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-blue-400', 'bg-red-600', 'text-white', 'shadow-red-400', 'bg-purple-600', 'text-white', 'shadow-purple-400');
+                if (btn.id === 'lowStockAlertBtn') {
+                    btn.classList.add('bg-white', 'text-red-600', 'border', 'border-red-400', 'hover:bg-red-50');
+                } else if (btn.id === 'shareClientCatalogBtn') {
+                     btn.classList.add('bg-white', 'text-purple-600', 'border', 'border-purple-400', 'hover:bg-purple-50');
+                } else {
+                    btn.classList.add('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                }
+            });
+
+            // Show selected section and set active button style
+            if (page === 'inventory') {
+                inventorySection.classList.remove('hidden');
+                inventoryBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                inventoryBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+                renderProducts();
+            } else if (page === 'displayCatalog') {
+                displayCatalogSection.classList.remove('hidden');
+                displayCatalogBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                displayCatalogBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+                renderDisplayCatalog();
+            } else if (page === 'calculator') {
+                calculatorSection.classList.remove('hidden');
+                calculatorBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                calculatorBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+                updateInventoryList();
+            } else if (page === 'salesReport') {
+                salesReportSection.classList.remove('hidden');
+                salesReportBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                salesReportBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+                renderSalesReports();
+            } else if (page === 'lowStockAlerts') { 
+                lowStockAlertsSection.classList.remove('hidden');
+                lowStockAlertBtn.classList.remove('bg-white', 'text-red-600', 'border', 'border-red-400', 'hover:bg-red-50');
+                lowStockAlertBtn.classList.add('bg-red-600', 'text-white', 'shadow-red-400');
+                renderLowStockAlerts(); 
+            } else if (page === 'advancedConfig') {
+                advancedConfigSection.classList.remove('hidden');
+                advancedConfigBtn.classList.remove('bg-white', 'text-blue-600', 'border', 'border-blue-400', 'hover:bg-blue-50');
+                advancedConfigBtn.classList.add('bg-blue-600', 'text-white', 'shadow-blue-400');
+            }
+        }
+
+        // Function to render products in the Inventory (Management) section
+        function renderProducts() {
+            productList.innerHTML = '';
+            const searchTerm = inventorySearchInput.value.toLowerCase();
+            const filteredProducts = products.filter(product => {
+                return (
+                    (product.name && product.name.toLowerCase().includes(searchTerm)) ||
+                    (product.sku && product.sku.toLowerCase().includes(searchTerm)) ||
+                    (product.description && product.description.toLowerCase().includes(searchTerm))
+                );
+            });
+
+            if (filteredProducts.length === 0) {
+                productList.innerHTML = '<p class="text-center text-gray-600 italic">¡No se encontraron tesoros que coincidan con tu búsqueda!</p>';
+                return;
+            }
+            filteredProducts.forEach((product, index) => {
+                const li = document.createElement('li');
+                // Apply low stock warning class if applicable
+                const isLowStock = product.quantity <= product.minStock;
+                li.className = `bg-white p-4 rounded-lg shadow-sm border border-purple-200 flex flex-col md:flex-row justify-between items-center ${isLowStock ? 'border-red-400 ring-2 ring-red-300' : ''}`;
+                
+                li.innerHTML = `
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image-display mr-4">` : '<img src="https://placehold.co/100x100/CCCCCC/666666?text=No+Img" alt="No Image" class="product-image-display mr-4">'}
+                    <div class="flex-grow text-left mb-2 md:mb-0">
+                        <p class="font-bold text-lg text-blue-700">${product.name}</p>
+                        <p class="text-gray-700">Precio de Venta: $${product.sellingPrice.toFixed(2)}</p>
+                        <p class="text-gray-700">SKU: ${product.sku}</p>
+                        <p class="text-gray-700">Cantidad: <span class="${isLowStock ? 'low-stock-warning' : ''}">${product.quantity}</span> ${isLowStock ? '<i class="fas fa-exclamation-triangle text-red-500 ml-1" title="Bajo Stock"></i>' : ''}</p>
+                        <p class="text-gray-700 text-sm">Mínimo Stock: ${product.minStock || 0}</p>
+                        <p class="text-gray-700 text-sm">Costo Base: $${product.baseCost.toFixed(2)}</p>
+                        <p class="text-gray-700 text-sm">Envío: $${product.shippingCost.toFixed(2)}</p>
+                        <p class="text-gray-700 text-sm">Ganancia: ${product.profitPercentage}%</p>
+                        <p class="text-gray-600 text-xs italic">Categoría: ${product.category || 'N/A'}</p>
+                        <p class="text-gray-600 text-xs italic">Descripción: ${product.description || 'N/A'}</p>
+                    </div>
+                    <div class="flex space-x-2 mt-2 md:mt-0">
+                        <button onclick="editProduct(${products.indexOf(product)})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-sm button-hover-effect">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button onclick="deleteProduct(${products.indexOf(product)})" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-sm button-hover-effect">
+                            <i class="fas fa-trash-alt"></i> Borrar
+                        </button>
+                    </div>
+                `;
+                productList.appendChild(li);
+            });
+        }
+
+        // Function to render the Display Catalog
+        function renderDisplayCatalog() {
+            displayProductGrid.innerHTML = '';
+            const selectedCategory = displayCategoryFilter.value;
+
+            const filteredProducts = products.filter(product => {
+                return selectedCategory === 'Todas' || (product.category && product.category === selectedCategory);
+            });
+
+            if (filteredProducts.length === 0) {
+                displayProductGrid.innerHTML = '<p class="text-center text-gray-600 italic sm:col-span-full">¡No se encontraron tesoros que coincidan con la categoría seleccionada!</p>';
+                return;
+            }
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col items-center text-center transition transform hover:scale-105 section-card';
+                card.innerHTML = `
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="w-32 h-32 object-contain rounded-lg mb-4 product-image-display">` : '<img src="https://placehold.co/128x128/CCCCCC/666666?text=No+Img" alt="No Image" class="w-32 h-32 object-contain rounded-lg mb-4">'}
+                    <p class="font-bold text-xl text-blue-800 mb-1">${product.name}</p>
+                    <p class="text-gray-700 text-sm mb-2">${product.description || 'Sin descripción'}</p>
+                    <p class="text-gray-600 text-xs italic">Categoría: ${product.category || 'N/A'}</p>
+                    <p class="font-extrabold text-2xl text-green-700">Precio: $${product.sellingPrice.toFixed(2)}</p>
+                    <p class="text-gray-500 text-xs mt-1">SKU: ${product.sku} | Cantidad: ${product.quantity}</p>
+                `;
+                displayProductGrid.appendChild(card);
+            });
+        }
+
+        // Function to update the inventory list in the Calculator section
+        function updateInventoryList() {
+            currentInventoryList.innerHTML = '';
+            if (products.length === 0) {
+                currentInventoryList.innerHTML = '<p class="text-center text-gray-600 italic">¡Añade tesoros en el Almacén primero!</p>';
+                return;
+            }
+            products.forEach(product => {
+                const li = document.createElement('li');
+                li.className = 'bg-white p-3 rounded-md shadow-sm border border-yellow-200 flex justify-between items-center';
+                li.innerHTML = `
+                    <span class="font-medium text-gray-800">${product.name} (SKU: ${product.sku})</span>
+                    <span class="font-bold text-blue-600">Cant: ${product.quantity}</span>
+                `;
+                currentInventoryList.appendChild(li);
+            });
+        }
+
+        // Function to add/update a product
+        let editingIndex = -1;
+
+        addProductBtn.addEventListener('click', () => {
+            const name = productNameInput.value.trim();
+            const sku = productSKUInput.value.trim();
+            const quantity = parseInt(productQuantityInput.value, 10);
+            const description = productDescriptionInput.value.trim();
+            const category = productCategoryInput.value;
+            const image = currentImageBase64;
+            const minStock = parseInt(minStockQuantityInput.value, 10) || 0; 
+
+            const baseCost = parseFloat(inputCost.value);
+            const shippingCost = parseFloat(inputShipping.value);
+            const profitPercentage = parseFloat(inputProfitPercentage.value);
+
+            if (!name || isNaN(baseCost) || isNaN(shippingCost) || !sku || isNaN(quantity) || isNaN(profitPercentage) || !category) {
+                showModal("¡Oye! Faltan datos para tu tesoro o los números no son correctos. Asegúrate de seleccionar una categoría.");
+                return;
+            }
+            if (profitPercentage < 0 || profitPercentage > 100) {
+                showModal("¡El Porcentaje de Ganancia debe estar entre 0 y 100!");
+                return;
+            }
+            if (minStock < 0) {
+                showModal("¡La cantidad mínima de stock no puede ser negativa!");
+                return;
+            }
+
+            const subtotal = baseCost + shippingCost;
+            const gananciaCantidad = subtotal * (profitPercentage / 100);
+            const sellingPrice = subtotal + gananciaCantidad;
+
+            const productData = {
+                name,
+                sellingPrice: sellingPrice,
+                sku,
+                quantity,
+                image,
+                baseCost,
+                shippingCost,
+                profitPercentage,
+                description,
+                category,
+                minStock 
+            };
+
+            if (editingIndex === -1) {
+                products.push(productData);
+                showModal("¡Tesoro guardado con éxito!");
+            } else {
+                products[editingIndex] = productData;
+                showModal("¡Tesoro actualizado con éxito!");
+                editingIndex = -1;
+                addProductBtn.textContent = '¡Guardar Tesoro!';
+            }
+
+            renderProducts();
+            saveProductsToLocalStorage();
+            // Clear input fields
+            productNameInput.value = '';
+            productSKUInput.value = '';
+            productQuantityInput.value = '';
+            productDescriptionInput.value = '';
+            productCategoryInput.value = '';
+            inputCost.value = '';
+            inputShipping.value = '';
+            inputProfitPercentage.value = '';
+            minStockQuantityInput.value = ''; 
+            productImageInput.value = '';
+            imagePreview.src = "https://placehold.co/100x100/A0B9D7/FFFFFF?text=Previa";
+            imagePreview.classList.add('hidden');
+            currentImageBase64 = '';
+        });
+
+        // Function to edit a product
+        window.editProduct = (index) => {
+            const product = products[index];
+            productNameInput.value = product.name;
+            productSKUInput.value = product.sku;
+            productQuantityInput.value = product.quantity;
+            productDescriptionInput.value = product.description || '';
+            productCategoryInput.value = product.category || '';
+            inputCost.value = product.baseCost;
+            inputShipping.value = product.shippingCost;
+            inputProfitPercentage.value = product.profitPercentage;
+            minStockQuantityInput.value = product.minStock || 0; 
+            editingIndex = index;
+            addProductBtn.textContent = '¡Actualizar Tesoro!';
+            
+            if (product.image) {
+                imagePreview.src = product.image;
+                imagePreview.classList.remove('hidden');
+                currentImageBase64 = product.image;
+            } else {
+                imagePreview.src = "https://placehold.co/100x100/A0B9D7/FFFFFF?text=Previa";
+                imagePreview.classList.add('hidden');
+                currentImageBase64 = '';
+            }
+
+            showModal("¡Ahora puedes cambiar los datos del tesoro!");
+        };
+
+        // Function to delete a product
+        window.deleteProduct = (index) => {
+            products.splice(index, 1);
+            renderProducts();
+            saveProductsToLocalStorage();
+            showModal("¡Tesoro eliminado para siempre!");
+        };
+
+        // Logic for calculating Shipping Per Unit
+        calculateShippingPerUnitBtn.addEventListener('click', () => {
+            const totalProductsCost = parseFloat(totalProductsCostInput.value);
+            const totalShippingCost = parseFloat(totalShippingCostInput.value);
+            const numberOfProducts = parseInt(numberOfProductsInput.value, 10);
+
+            if (isNaN(totalProductsCost) || isNaN(totalShippingCost) || isNaN(numberOfProducts)) {
+                showModal("¡Necesito números válidos para todos los campos!");
+                return;
+            }
+            if (numberOfProducts <= 0) {
+                showModal("¡La cantidad de productos debe ser mayor que cero para calcular el envío por unidad!");
+                return;
+            }
+
+            const shippingPerUnit = totalShippingCost / numberOfProducts;
+            shippingPerUnitResultSpan.textContent = `$${shippingPerUnit.toFixed(2)}`;
+            shippingPerUnitResultSpan.className = 'text-green-700';
+
+            showModal(`¡El costo de envío por cada tesoro es $${shippingPerUnit.toFixed(2)}!`);
+        });
+
+        // Function to update product quantity in inventory
+        updateQuantityBtn.addEventListener('click', () => {
+            const sku = calcSKUInput.value.trim();
+            const change = parseInt(calcQuantityChangeInput.value, 10);
+
+            if (!sku || isNaN(change)) {
+                showModal("¡Dime qué tesoro y cuántos! SKU y cantidad son importantes.");
+                return;
+            }
+
+            const productToUpdate = products.find(p => p.sku === sku);
+            if (!productToUpdate) {
+                showModal("¡Ese tesoro no lo encuentro por su SKU!");
+                return;
+            }
+
+            const newQuantity = productToUpdate.quantity + change;
+            if (newQuantity < 0) {
+                showModal("¡No puedes tener cantidades negativas de tesoros! Revisa tu número.");
+                return;
+            }
+
+            productToUpdate.quantity = newQuantity;
+            updateInventoryList();
+            renderProducts();
+            saveProductsToLocalStorage();
+            showModal(`¡Cantidad de ${productToUpdate.name} actualizada a ${newQuantity}!`);
+            calcSKUInput.value = '';
+            calcQuantityChangeInput.value = '';
+        });
+
+        // ===========================================
+        // SALES REPORTS FUNCTIONS
+        // ===========================================
+
+        addSaleBtn.addEventListener('click', () => {
+            const saleDate = saleDateInput.value;
+            const saleSKU = saleSKUInput.value.trim();
+            const saleQuantity = parseInt(saleQuantityInput.value, 10);
+
+            if (!saleDate || !saleSKU || isNaN(saleQuantity) || saleQuantity <= 0) {
+                showModal("¡Por favor, completa todos los campos de la venta correctamente!");
+                return;
+            }
+
+            const productSold = products.find(p => p.sku === saleSKU);
+            if (!productSold) {
+                showModal("¡No se encontró un tesoro con ese SKU en tu inventario!");
+                return;
+            }
+            if (productSold.quantity < saleQuantity) {
+                showModal(`¡Solo tienes ${productSold.quantity} de ${productSold.name}! No puedes vender ${saleQuantity}.`);
+                return;
+            }
+
+            // Register the sale
+            const revenue = productSold.sellingPrice * saleQuantity;
+            const newSaleRecord = {
+                date: saleDate,
+                sku: saleSKU,
+                productName: productSold.name,
+                quantity: saleQuantity,
+                sellingPricePerUnit: productSold.sellingPrice,
+                totalRevenue: revenue
+            };
+            salesRecords.push(newSaleRecord);
+
+            // Update inventory
+            productSold.quantity -= saleQuantity;
+
+            // Save and re-render
+            saveProductsToLocalStorage();
+            saveSalesRecordsToLocalStorage();
+            renderSalesReports();
+            renderProducts(); 
+            updateInventoryList(); 
+            renderLowStockAlerts(); 
+
+            showModal(`¡Venta de ${saleQuantity} ${productSold.name} registrada con éxito!`);
+            saleDateInput.value = '';
+            saleSKUInput.value = '';
+            saleQuantityInput.value = '';
+        });
+
+        function renderSalesReports() {
+            let totalItemsSold = 0;
+            let totalRevenue = 0;
+            salesTableBody.innerHTML = '';
+
+            if (salesRecords.length === 0) {
+                noSalesMessageRow.style.display = 'table-row';
+            } else {
+                noSalesMessageRow.style.display = 'none';
+                salesRecords.forEach(sale => {
+                    totalItemsSold += sale.quantity;
+                    totalRevenue += sale.totalRevenue;
+
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-100 hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="py-2 px-4 text-sm text-gray-800">${sale.date}</td>
+                        <td class="py-2 px-4 text-sm text-gray-800">${sale.productName} (SKU: ${sale.sku})</td>
+                        <td class="py-2 px-4 text-sm text-gray-800">${sale.quantity}</td>
+                        <td class="py-2 px-4 text-sm text-green-700 font-semibold">$${sale.totalRevenue.toFixed(2)}</td>
+                    `;
+                    salesTableBody.appendChild(row);
+                });
+            }
+
+            totalItemsSoldSpan.textContent = totalItemsSold;
+            totalRevenueSpan.textContent = `$${totalRevenue.toFixed(2)}`;
+        }
+
+        // ===========================================
+        // LOW STOCK ALERTS FUNCTIONS (NEW)
+        // ===========================================
+        function renderLowStockAlerts() {
+            lowStockList.innerHTML = ''; 
+            const lowStockProducts = products.filter(product => product.quantity <= product.minStock);
+
+            if (lowStockProducts.length === 0) {
+                lowStockList.innerHTML = '<p class="text-center text-gray-600 italic">¡Todos tus tesoros tienen stock suficiente!</p>';
+            } else {
+                lowStockProducts.forEach(product => {
+                    const li = document.createElement('li');
+                    li.className = 'bg-white p-4 rounded-lg shadow-sm border border-red-300 flex flex-col md:flex-row justify-between items-center';
+                    li.innerHTML = `
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image-display mr-4">` : '<img src="https://placehold.co/100x100/CCCCCC/666666?text=No+Img" alt="No Image" class="product-image-display mr-4">'}
+                        <div class="flex-grow text-left mb-2 md:mb-0">
+                            <p class="font-bold text-lg text-red-700">${product.name} <i class="fas fa-exclamation-circle ml-1"></i></p>
+                            <p class="text-gray-700">SKU: ${product.sku}</p>
+                            <p class="text-gray-700">Cantidad Actual: <span class="low-stock-warning">${product.quantity}</span></p>
+                            <p class="text-gray-700">Cantidad Mínima: ${product.minStock}</p>
+                            <p class="text-gray-600 text-xs italic">Categoría: ${product.category || 'N/A'}</p>
+                        </div>
+                        <div class="flex space-x-2 mt-2 md:mt-0">
+                            <button onclick="showPage('inventory'); editProduct(${products.indexOf(product)})" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105 shadow-sm button-hover-effect">
+                                <i class="fas fa-edit"></i> Reabastecer
+                            </button>
+                        </div>
+                    `;
+                    lowStockList.appendChild(li);
+                });
+            }
+        }
+
+
+        // Connect navigation buttons to page display functions
+        inventoryBtn.addEventListener('click', () => showPage('inventory'));
+        displayCatalogBtn.addEventListener('click', () => showPage('displayCatalog'));
+        calculatorBtn.addEventListener('click', () => showPage('calculator'));
+        salesReportBtn.addEventListener('click', () => showPage('salesReport'));
+        lowStockAlertBtn.addEventListener('click', () => showPage('lowStockAlerts')); 
+        advancedConfigBtn.addEventListener('click', () => showPage('advancedConfig'));
+        // Event listener for the new "Share Client Catalog" button
+        shareClientCatalogBtn.addEventListener('click', () => {
+            // This will open the client version of the catalog in a new tab/window
+            // The client version HTML file must be in the same directory or adjust the path accordingly.
+            window.open('mi-tienda-clientes.html', '_blank');
+        });
+
+
+        // Event listeners for search and filter inputs
+        inventorySearchInput.addEventListener('input', renderProducts);
+        displayCategoryFilter.addEventListener('change', renderDisplayCatalog);
+
+        // ===========================================
+        // LOCAL STORAGE AND PROTECTION FUNCTIONS
+        // ===========================================
+
+        // Save products to Local Storage
+        function saveProductsToLocalStorage() {
+            try {
+                localStorage.setItem('myMagicShopProducts', JSON.stringify(products));
+            } catch (e) {
+                console.error("Error al guardar en Local Storage:", e);
+                showModal("¡Oh no! No pude guardar tus tesoros. ¿El cajón secreto está lleno?");
+            }
+        }
+
+        // Load products from Local Storage
+        function loadProductsFromLocalStorage() {
+            try {
+                const storedProducts = localStorage.getItem('myMagicShopProducts');
+                if (storedProducts) {
+                    products = JSON.parse(storedProducts);
+                    // Ensure older products have default minStock and category if missing
+                    products = products.map(product => ({
+                        ...product,
+                        category: product.category || 'Otros',
+                        minStock: typeof product.minStock === 'number' ? product.minStock : 0 
+                    }));
+                } else {
+                    products = [];
+                }
+            } catch (e) {
+                console.error("Error al cargar de Local Storage:", e);
+                showModal("¡Oh no! No pude cargar tus tesoros. ¿El cajón secreto se perdió?");
+                products = [];
+            }
+        }
+
+        // Save sales records to Local Storage
+        function saveSalesRecordsToLocalStorage() {
+            try { 
+                localStorage.setItem('myMagicShopSales', JSON.stringify(salesRecords));
+            }
+            catch (e) {
+                console.error("Error al guardar ventas en Local Storage:", e);
+                showModal("¡Oh no! No pude guardar tus ventas. ¡Que no se pierdan esos números!");
+            }
+        }
+
+        // Load sales records from Local Storage
+        function loadSalesRecordsFromLocalStorage() {
+            try {
+                const storedSales = localStorage.getItem('myMagicShopSales');
+                if (storedSales) {
+                    salesRecords = JSON.parse(storedSales);
+                } else {
+                    salesRecords = [];
+                }
+            } catch (e) {
+                console.error("Error al cargar ventas de Local Storage:", e);
+                showModal("¡Oh no! No pude cargar tus ventas. Revisa si el cajón secreto está dañado.");
+                salesRecords = [];
+            }
+        }
+
+        // Event listener for the "Clear All" button with password protection
+        clearLocalStorageBtn.addEventListener('click', () => {
+            showPasswordModal(() => {
+                localStorage.removeItem('myMagicShopProducts');
+                localStorage.removeItem('myMagicShopSales');
+                products = [];
+                salesRecords = [];
+                renderProducts();
+                updateInventoryList();
+                renderDisplayCatalog();
+                renderSalesReports();
+                renderLowStockAlerts(); 
+                showModal("¡Todos tus tesoros y ventas han sido borrados del Cuaderno Mágico!");
+            });
+        });
+
+        // ===========================================
+        // BACKUP/RESTORE FUNCTIONS (NEW)
+        // ===========================================
+
+        // Export data to JSON file
+        exportDataBtn.addEventListener('click', () => {
+            const dataToExport = {
+                products: products,
+                salesRecords: salesRecords
+            };
+            const jsonString = JSON.stringify(dataToExport, null, 2); // Pretty print JSON
+
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mi_tienda_magica_backup.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showModal("¡Copia de seguridad mágica descargada con éxito!");
+        });
+
+        // Import data from JSON file
+        importDataBtn.addEventListener('click', () => {
+            // Trigger the hidden file input click
+            importFileInput.click();
+        });
+
+        importFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                showModal("¡Por favor, selecciona un archivo para importar!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    if (importedData.products && Array.isArray(importedData.products) &&
+                        importedData.salesRecords && Array.isArray(importedData.salesRecords)) {
+                        
+                        // Optional: Confirm before overwriting
+                        showPasswordModal(() => { // Reusing password modal for security
+                            products = importedData.products.map(product => ({
+                                ...product,
+                                category: product.category || 'Otros',
+                                minStock: typeof product.minStock === 'number' ? product.minStock : 0 
+                            }));
+                            salesRecords = importedData.salesRecords;
+
+                            saveProductsToLocalStorage();
+                            saveSalesRecordsToLocalStorage();
+
+                            renderProducts();
+                            updateInventoryList();
+                            renderDisplayCatalog();
+                            renderSalesReports();
+                            renderLowStockAlerts();
+
+                            showModal("¡Datos restaurados con éxito! Tu tienda mágica está como nueva.");
+                        });
+
+                    } else {
+                        showModal("¡El archivo seleccionado no parece ser un archivo de copia de seguridad válido para tu tienda!");
+                    }
+                } catch (error) {
+                    console.error("Error al leer o parsear el archivo JSON:", error);
+                    showModal("¡Hubo un problema al leer el archivo! Asegúrate de que sea un archivo JSON válido y no esté corrupto.");
+                }
+            };
+            reader.readAsText(file);
+             // Clear the file input after reading, so the same file can be selected again if needed
+            importFileInput.value = '';
+        });
+
+
+        // ===========================================
+        // DOWNLOAD FUNCTIONS
+        // ===========================================
+
+        // Function to download the complete Inventory as an HTML file
+        downloadInventoryBtn.addEventListener('click', () => {
+            if (products.length === 0) {
+                showModal("¡No hay tesoros en el inventario para descargar!");
+                return;
+            }
+
+            let htmlContent = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Reporte de Inventario Completo</title>
+                    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+                    <style>
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            min-height: 100vh;
+                        }
+                        .container {
+                            width: 100%;
+                            max-width: 1000px;
+                            background-color: #ffffff;
+                            padding: 32px;
+                            border-radius: 12px;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                            border: 1px solid #bfdbfe;
+                        }
+                        h1 {
+                            font-size: 2.25rem;
+                            font-weight: 800;
+                            color: #1e40af;
+                            text-align: center;
+                            margin-bottom: 24px;
+                            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                        }
+                        .product-item {
+                            background-color: #f9fafb;
+                            padding: 16px;
+                            border-radius: 8px;
+                            border: 1px solid #e0e7ff;
+                            margin-bottom: 12px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
+                        }
+                        .product-item strong {
+                            color: #1f2937;
+                        }
+                        .product-item span {
+                            color: #4b5563;
+                        }
+                        .product-image {
+                            width: 80px;
+                            height: 80px;
+                            object-fit: contain;
+                            border-radius: 4px;
+                            border: 1px solid #d1d5db;
+                            margin-right: 16px;
+                        }
+                        .product-details {
+                            flex-grow: 1;
+                        }
+                        @media (min-width: 640px) {
+                            .product-item {
+                                flex-direction: row;
+                                align-items: center;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1><i class="fas fa-boxes mr-2"></i>Reporte de Inventario Completo</h1>
+                        ${products.length === 0 ? '<p class="text-center text-gray-600 italic">No hay productos en el inventario.</p>' : ''}
+            `;
+
+            products.forEach(product => {
+                htmlContent += `
+                    <div class="product-item">
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : '<img src="https://placehold.co/80x80/CCCCCC/666666?text=No+Img" alt="No Image" class="product-image">'}
+                        <div class="product-details">
+                            <p><strong>Nombre:</strong> <span>${product.name || 'N/A'}</span></p>
+                            <p><strong>SKU:</strong> <span>${product.sku || 'N/A'}</span></p>
+                            <p><strong>Cantidad:</strong> <span>${product.quantity || 0}</span></p>
+                            <p><strong>Cantidad Mínima:</strong> <span>${product.minStock || 0}</span></p>
+                            <p><strong>Precio de Venta:</strong> <span>$${(product.sellingPrice || 0).toFixed(2)}</span></p>
+                            <p><strong>Costo Base:</strong> <span>$${(product.baseCost || 0).toFixed(2)}</span></p>
+                            <p><strong>Costo Envío Individual:</strong> <span>$${(product.shippingCost || 0).toFixed(2)}</span></p>
+                            <p><strong>% Ganancia:</strong> <span>${(product.profitPercentage || 0).toFixed(0)}%</span></p>
+                            <p><strong>Categoría:</strong> <span>${product.category || 'N/A'}</span></p>
+                            <p><strong>Descripción:</strong> <span>${product.description || 'Sin descripción'}</span></p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            htmlContent += `
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'inventario_completo.html');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showModal("¡Tu inventario completo se ha descargado!");
+            } else {
+                showModal("¡Tu navegador no soporta la descarga directa! Copia el código y guárdalo como un archivo .html.");
+            }
+        });
+
+        // Function to download the Display Catalog as an HTML file
+        downloadDisplayCatalogBtn.addEventListener('click', () => {
+            if (products.length === 0) {
+                showModal("¡No hay tesoros en el catálogo de exhibición para descargar!");
+                return;
+            }
+
+            let htmlContent = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Mi Catálogo de Exhibición</title>
+                    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+                    <style>
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            background: linear-gradient(to bottom right, #e0f2fe, #f0f9ff);
+                            padding: 20px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            min-height: 100vh;
+                        }
+                        .container {
+                            width: 100%;
+                            max-width: 960px;
+                            background-color: #ffffff;
+                            padding: 32px;
+                            border-radius: 12px;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                            border: 1px solid #bfdbfe;
+                        }
+                        h1 {
+                            font-size: 2.25rem;
+                            font-weight: 800;
+                            color: #1e40af;
+                            text-align: center;
+                            margin-bottom: 24px;
+                            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                        }
+                        .grid-catalog {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                            gap: 24px;
+                        }
+                        .product-card {
+                            background-color: #ffffff;
+                            padding: 16px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                            border: 1px solid #e5e7eb;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            text-align: center;
+                            transition: transform 0.3s ease-in-out;
+                        }
+                        .product-card:hover {
+                            transform: scale(1.03);
+                        }
+                        .product-image-display {
+                            width: 128px;
+                            height: 128px;
+                            object-fit: contain;
+                            border-radius: 8px;
+                            margin-bottom: 16px;
+                        }
+                        .product-name {
+                            font-weight: 700;
+                            font-size: 1.25rem;
+                            color: #1d4ed8;
+                            margin-bottom: 4px;
+                        }
+                        .product-description {
+                            color: #4b5563;
+                            font-size: 0.875rem;
+                            margin-bottom: 8px;
+                        }
+                        .product-price {
+                            font-weight: 800;
+                            font-size: 1.5rem;
+                            color: #059669;
+                        }
+                        .contact-section {
+                            margin-top: 32px;
+                            padding: 24px;
+                            background-color: #e0f2fe;
+                            border-radius: 12px;
+                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                            border: 1px solid #bfdbfe;
+                            text-align: center;
+                        }
+                        .contact-section h2 {
+                            font-size: 1.5rem;
+                            font-weight: 700;
+                            color: #1e40af;
+                            margin-bottom: 12px;
+                        }
+                        .contact-section p {
+                            color: #4b5563;
+                            font-size: 1.125rem;
+                            margin-bottom: 8px;
+                        }
+                        .contact-section .whatsapp-link {
+                            color: #2563eb;
+                            text-decoration: underline;
+                        }
+                        .contact-section .font-semibold {
+                            font-weight: 600;
+                            color: #1c3faa;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>¡Nuestro Escaparate Mágico de Accesorios!</h1>
+                        <div id="displayProductGridDownloaded" class="grid-catalog">
+            `;
+
+            if (products.length === 0) {
+                htmlContent += `<p class="text-center text-gray-600 italic sm:col-span-full">¡Aún no hay tesoros para mostrar en el escaparate!</p>`;
+            } else {
+                products.forEach(product => {
+                    htmlContent += `
+                        <div class="product-card">
+                            ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image-display">` : '<img src="https://placehold.co/128x128/CCCCCC/666666?text=No+Img" alt="No Image" class="product-image-display">'}
+                            <p class="product-name">${product.name}</p>
+                            <p class="product-description">${product.description || 'Sin descripción'}</p>
+                            <p class="product-price">Precio: $${(product.sellingPrice || 0).toFixed(2)}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            htmlContent += `
+                        </div>
+                    </div>
+                    <!-- Contact information for the downloaded catalog -->
+                    <div class="contact-section">
+                        <h2>¡Contáctanos!</h2>
+                        <p>
+                            <i class="fab fa-whatsapp text-green-500 mr-2"></i>Whatsapp: <a href="https://wa.me/584248347653" target="_blank" class="whatsapp-link">04248347653</a>
+                        </p>
+                        <p>
+                            Hacemos entregas personales en <span class="font-semibold">San Juan de Los Morros</span> y envíos a nivel nacional.
+                        </p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'catalogo_exhibicion.html');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showModal("¡Tu Catálogo de Exhibición se ha descargado!");
+            } else {
+                showModal("¡Tu navegador no soporta la descarga directa! Copia el código HTML y guárdalo como un archivo .html.");
+            }
+        });
+
+        // On page load, load saved products and sales records, then show the inventory by default
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductsFromLocalStorage();
+            loadSalesRecordsFromLocalStorage();
+            showPage('inventory'); // Default page to show on load
+        });
+    </script>
+</body>
+</html>
